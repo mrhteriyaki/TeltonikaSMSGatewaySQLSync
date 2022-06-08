@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace TeltonikaService
 {
@@ -24,6 +25,51 @@ namespace TeltonikaService
             public string text;
             public string status;
         }
+
+        static public void SendSMS(string number, string message)
+        {
+            string urlmsg = HttpUtility.UrlEncode(message);
+            SendRequest("sms_send", "number=" + number + "&text=" + urlmsg);
+        }
+
+        static public void ProcessOutbox()
+        {
+            SqlConnection conn = new SqlConnection(sqlserver);
+            SqlCommand sqlcmd = new SqlCommand();
+            sqlcmd.Connection = conn;
+            
+            conn.Open();
+            sqlcmd.CommandText = "SELECT id,number,message FROM tblOutbox";
+            List<SMSMessage> outbox_list = new List<SMSMessage>();
+            SqlDataReader SQLOutput = sqlcmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                SMSMessage tmpMsg = new SMSMessage();
+                tmpMsg.index = (int)SQLOutput[0];
+                tmpMsg.sender = SQLOutput[1].ToString();
+                tmpMsg.text = SQLOutput[2].ToString();
+                outbox_list.Add(tmpMsg);
+            }
+            SQLOutput.Close();
+            
+            foreach(SMSMessage msg in outbox_list)
+            {
+                SendSMS(msg.sender, msg.text);
+
+                //Remove from DB.
+                sqlcmd.CommandText = "DELETE FROM tblOutbox WHERE id = @mid";
+                sqlcmd.Parameters.AddWithValue("mid", msg.index);
+                sqlcmd.ExecuteNonQuery();
+                sqlcmd.Parameters.Clear();
+            }
+            
+            
+            conn.Close();
+
+
+        }
+
+
 
         static public void GetMessageList()
         {

@@ -37,8 +37,26 @@ namespace TeltonikaService
         {
             while (shutdown == false)
             {
-                TeltonikaService.TeltonikaFunctions.GetMessageList();
+                //Check messages.
+                try
+                {
+                    TeltonikaService.TeltonikaFunctions.GetMessageList();
+                }
+                catch
+                {
+
+                }
+                //Process outbox.
+                try
+                {
+                    TeltonikaService.TeltonikaFunctions.ProcessOutbox();
+                }
+                catch
+                {
+
+                }
                 
+
                 int counter = 0; //delay 15 seconds
                 while (counter < 150 && shutdown == false)
                 {
