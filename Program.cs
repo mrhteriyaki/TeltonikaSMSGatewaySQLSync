@@ -17,7 +17,7 @@ namespace TeltonikaService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                new svcTeltonikaService()
             };
             ServiceBase.Run(ServicesToRun);
         }
