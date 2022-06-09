@@ -33,6 +33,7 @@
             // 
             // svcTeltonikaProcessInstaller
             // 
+            this.svcTeltonikaProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
             this.svcTeltonikaProcessInstaller.Password = null;
             this.svcTeltonikaProcessInstaller.Username = null;
             // 

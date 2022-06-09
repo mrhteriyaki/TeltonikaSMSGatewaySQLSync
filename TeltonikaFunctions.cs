@@ -13,10 +13,75 @@ namespace TeltonikaService
 {
     public class TeltonikaFunctions
     {
-        static string username = "smsuser";
-        static string password = "sms3131";
-        static string gateway = "192.168.2.1";
-        static string sqlserver = "Data Source=MRH-DC,1433;Initial Catalog=SMS;Integrated Security=true";
+        static string username;// = "smsuser";
+        static string password;// = "sms3131";
+        static string gateway;// = "192.168.2.1";
+        static string sqlserver; // = "Data Source=MRH-DC,1433;Initial Catalog=SMS;Integrated Security=true";
+
+        static string smtpserver;
+        static string fromaddress;
+        static string toaddress;
+
+        public static void LoadConfig()
+        {
+            
+            string AppDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).Replace("file:\\", "");
+            Console.WriteLine("Running from:" + AppDirectory);
+
+            int count = 0;
+            foreach (string line in File.ReadAllLines(AppDirectory + "\\config.ini"))
+            {
+                if (line.StartsWith("username="))
+                {
+                    username = line.Substring(9);
+                    count++;
+                }
+                else if (line.StartsWith("password="))
+                {
+                    password = line.Substring(9);
+                    count++;
+                }
+                else if (line.StartsWith("gateway="))
+                {
+                    gateway = line.Substring(8);
+                    count++;
+                }
+                else if (line.StartsWith("sqlserver="))
+                {
+                    sqlserver = line.Substring(10);
+                    count++;
+                }
+                else if (line.StartsWith("smtpserver="))
+                {
+                    smtpserver = line.Substring(11);
+                    count++;
+                }
+                else if (line.StartsWith("fromaddress="))
+                {
+                    fromaddress = line.Substring(12);
+                    count++;
+                }
+                else if (line.StartsWith("toaddress="))
+                {
+                    toaddress = line.Substring(10);
+                    count++;
+                }
+            }
+            if (count != 7)
+            {
+                Console.WriteLine("Error in config file (missing property).");
+            }
+
+            //Test SQL Connection.
+            SqlConnection conn = new SqlConnection(sqlserver);
+            conn.Open();
+            conn.Close();
+
+
+        }
+
+
+
         public class SMSMessage
         {
             public int index;
@@ -37,7 +102,7 @@ namespace TeltonikaService
             SqlConnection conn = new SqlConnection(sqlserver);
             SqlCommand sqlcmd = new SqlCommand();
             sqlcmd.Connection = conn;
-            
+
             conn.Open();
             sqlcmd.CommandText = "SELECT id,number,message FROM tblOutbox";
             List<SMSMessage> outbox_list = new List<SMSMessage>();
@@ -51,8 +116,8 @@ namespace TeltonikaService
                 outbox_list.Add(tmpMsg);
             }
             SQLOutput.Close();
-            
-            foreach(SMSMessage msg in outbox_list)
+
+            foreach (SMSMessage msg in outbox_list)
             {
                 SendSMS(msg.sender, msg.text);
 
@@ -62,8 +127,8 @@ namespace TeltonikaService
                 sqlcmd.ExecuteNonQuery();
                 sqlcmd.Parameters.Clear();
             }
-            
-            
+
+
             conn.Close();
 
 
@@ -122,7 +187,8 @@ namespace TeltonikaService
                 {
                     SendEmail(msg.sender, msg.datetime.ToString(), msg.text);
                     Console.WriteLine("Message sent to email.");
-                }catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine("Failed to send email: " + ex.ToString());
                 }
@@ -133,21 +199,21 @@ namespace TeltonikaService
 
         public static void SendEmail(string sender, string datetime, string message)
         {
-            string htmlbody = "<body>From: " + sender + "<br>" + "Timestamp: " + datetime + "<br>Message:<br>" + message.Replace("\n","<br>") + "</body>";
+            string htmlbody = "<body>From: " + sender + "<br>" + "Timestamp: " + datetime + "<br>Message:<br>" + message.Replace("\n", "<br>") + "</body>";
 
             SmtpClient Smtp_Server = new SmtpClient();
             MailMessage e_mail = new MailMessage();
             Smtp_Server.Port = 25;
             Smtp_Server.EnableSsl = true;
-            Smtp_Server.Host = "mrhsystems-com.mail.protection.outlook.com";
+            Smtp_Server.Host = smtpserver; //"mrhsystems-com.mail.protection.outlook.com";
 
-            MailAddress FromAddress = new MailAddress("sms@mrhsystems.com");
-            e_mail.From = FromAddress;
-            e_mail.To.Add("m@mrhsystems.com");
+            MailAddress FA = new MailAddress(fromaddress);
+            e_mail.From = FA;
+            e_mail.To.Add(toaddress);
             e_mail.Subject = "SMS from" + sender;
             e_mail.IsBodyHtml = true;
             e_mail.Body = htmlbody;
-            
+
             Smtp_Server.Send(e_mail);
 
         }

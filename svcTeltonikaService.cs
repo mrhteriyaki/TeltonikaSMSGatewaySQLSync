@@ -22,6 +22,8 @@ namespace TeltonikaService
 
         protected override void OnStart(string[] args)
         {
+         
+
             Thread ProcThread = new Thread(ProcessLoop);
             ProcThread.Start();
             
@@ -35,12 +37,14 @@ namespace TeltonikaService
 
         void ProcessLoop()
         {
+            TeltonikaFunctions.LoadConfig(); //Load Configuration info.
+
             while (shutdown == false)
             {
                 //Check messages.
                 try
                 {
-                    TeltonikaService.TeltonikaFunctions.GetMessageList();
+                    TeltonikaFunctions.GetMessageList();
                 }
                 catch
                 {
@@ -49,7 +53,7 @@ namespace TeltonikaService
                 //Process outbox.
                 try
                 {
-                    TeltonikaService.TeltonikaFunctions.ProcessOutbox();
+                    TeltonikaFunctions.ProcessOutbox();
                 }
                 catch
                 {
