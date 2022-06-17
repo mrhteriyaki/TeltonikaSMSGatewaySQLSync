@@ -14,7 +14,7 @@ namespace TeltonikaService
     public partial class svcTeltonikaService : ServiceBase
     {
         static bool shutdown = false;
-       
+
         public svcTeltonikaService()
         {
             InitializeComponent();
@@ -22,11 +22,11 @@ namespace TeltonikaService
 
         protected override void OnStart(string[] args)
         {
-         
+
 
             Thread ProcThread = new Thread(ProcessLoop);
             ProcThread.Start();
-            
+
         }
 
         protected override void OnStop()
@@ -37,7 +37,22 @@ namespace TeltonikaService
 
         void ProcessLoop()
         {
-            TeltonikaFunctions.LoadConfig(); //Load Configuration info.
+            bool loadok = false;
+            do
+            {
+                try
+                {
+                    TeltonikaFunctions.LoadConfig(); //Load Configuration info.
+                    WinLogging.LogEvent("Load Config OK", EventLogEntryType.Information);
+                    loadok = true;
+                }
+                catch (Exception ex)
+                {
+                    WinLogging.LogEvent("Load Config Failure", EventLogEntryType.Warning);
+                    Thread.Sleep(500);
+                }
+            } while (loadok == false && shutdown == false);
+            
 
             while (shutdown == false)
             {
@@ -46,20 +61,20 @@ namespace TeltonikaService
                 {
                     TeltonikaFunctions.GetMessageList();
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    WinLogging.LogEvent("Get Message list failure exception: " + ex.ToString(), EventLogEntryType.Error);
                 }
                 //Process outbox.
                 try
                 {
                     TeltonikaFunctions.ProcessOutbox();
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    WinLogging.LogEvent("Outbox processing failure exception: " + ex.ToString(), EventLogEntryType.Error);
                 }
-                
+
 
                 int counter = 0; //delay 15 seconds
                 while (counter < 150 && shutdown == false)
@@ -67,11 +82,11 @@ namespace TeltonikaService
                     System.Threading.Thread.Sleep(100);
                     counter++;
                 }
-                
+
             }
-            
+
         }
 
-       
+
     }
 }

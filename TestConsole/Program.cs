@@ -11,8 +11,9 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
+            WinLogging.RegisterLog();
             TeltonikaFunctions.LoadConfig();
-            TeltonikaFunctions.GetMessageList();
+            //TeltonikaFunctions.GetMessageList();
 
         }
     }
