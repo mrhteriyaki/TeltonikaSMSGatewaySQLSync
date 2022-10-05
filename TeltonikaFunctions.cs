@@ -271,7 +271,7 @@ namespace TeltonikaService
             SqlConnection conn = new SqlConnection(sqlserver);
             SqlCommand sqlcmd = new SqlCommand();
             sqlcmd.Connection = conn;
-            sqlcmd.CommandText = "INSERT into tblMessages ([sender],[message],[timestamp]) VALUES (@sender,@message,@timestamp)";
+            sqlcmd.CommandText = "INSERT into tblMessages ([sender],[message],[timestamp],[timestamp_router]) VALUES (@sender,@message,GETDATE(),@timestamp)";
             sqlcmd.Parameters.AddWithValue("sender", message.sender);
             sqlcmd.Parameters.AddWithValue("message", message.text);
             sqlcmd.Parameters.AddWithValue("timestamp", message.datetime);
