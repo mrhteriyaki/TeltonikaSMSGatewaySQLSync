@@ -205,7 +205,7 @@ namespace TeltonikaService
             MailMessage e_mail = new MailMessage();
             Smtp_Server.Port = 25;
             Smtp_Server.EnableSsl = true;
-            Smtp_Server.Host = smtpserver; //"mrhsystems-com.mail.protection.outlook.com";
+            Smtp_Server.Host = smtpserver;
 
             MailAddress FA = new MailAddress(fromaddress);
             e_mail.From = FA;
