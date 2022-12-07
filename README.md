@@ -1,4 +1,4 @@
-#Teltonika Service.
+# Teltonika Service.
 
 Checks for SMS Messages on Teltonika mobile router.
 Saves them to local MS SQL Server and sends copy via E-Mail.
