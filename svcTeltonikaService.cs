@@ -38,6 +38,8 @@ namespace TeltonikaService
         void ProcessLoop()
         {
             bool loadok = false;
+            bool error_state_in = false;
+            bool error_state_out = false;
             do
             {
                 try
@@ -60,24 +62,34 @@ namespace TeltonikaService
                 try
                 {
                     TeltonikaFunctions.GetMessageList();
+                    error_state_in = false; //clear error state.
                 }
                 catch (Exception ex)
                 {
-                    WinLogging.LogEvent("Get Message list failure exception: " + ex.ToString(), EventLogEntryType.Error);
+                    if (error_state_in == false) //only log 1 error.
+                    {
+                        WinLogging.LogEvent("Get Message list failure exception: " + ex.ToString(), EventLogEntryType.Error);
+                        error_state_in = true;
+                    }                   
                 }
                 //Process outbox.
                 try
                 {
                     TeltonikaFunctions.ProcessOutbox();
+                    error_state_out = false;
                 }
                 catch (Exception ex)
                 {
-                    WinLogging.LogEvent("Outbox processing failure exception: " + ex.ToString(), EventLogEntryType.Error);
+                    if (error_state_out == false)
+                    {
+                        WinLogging.LogEvent("Outbox processing failure exception: " + ex.ToString(), EventLogEntryType.Error);
+                        error_state_out = true;
+                    }
                 }
 
 
-                int counter = 0; //delay 15 seconds
-                while (counter < 150 && shutdown == false)
+                int counter = 0; //delay 1 seconds
+                while (counter < 10 && shutdown == false)
                 {
                     System.Threading.Thread.Sleep(100);
                     counter++;
