@@ -230,12 +230,7 @@ namespace TeltonikaService
         }
 
 
-        public static string SendRequest(string request_type)
-        {
-            return SendRequest(request_type, "");
-        }
-
-        public static string SendRequest(string request_type, string param)
+        public static string SendRequest(string request_type, string param = "")
         {
             // Create a request for the URL. 		
             if (param != "")
