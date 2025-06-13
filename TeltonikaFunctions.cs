@@ -199,8 +199,13 @@ namespace TeltonikaService
 
         public static void SendEmail(string sender, string datetime, string message)
         {
-            string htmlbody = "<body>From: " + sender + "<br>" + "Timestamp: " + datetime + "<br>Message:<br>" + message.Replace("\n", "<br>") + "</body>";
+            if (string.IsNullOrEmpty(smtpserver))
+            {
+                return; //Skip email if smtp not configured.
+            }
 
+            string htmlbody = "<body>From: " + sender + "<br>" + "Timestamp: " + datetime + "<br>Message:<br>" + message.Replace("\n", "<br>") + "</body>";
+            
             SmtpClient Smtp_Server = new SmtpClient();
             MailMessage e_mail = new MailMessage();
             Smtp_Server.Port = 25;
