@@ -159,7 +159,7 @@ namespace TeltonikaService
                 }
                 else if (Line.StartsWith("Sender: "))
                 {
-                    message.sender = Line.Substring(8);
+                    message.number = Line.Substring(8);
                 }
                 else if (Line.StartsWith("Text: "))
                 {
@@ -182,13 +182,13 @@ namespace TeltonikaService
 
             foreach (SMSMessage msg in message_list)
             {
-                Console.WriteLine("Logged message from " + msg.sender);
+                Console.WriteLine("Logged message from " + msg.number);
                 DBAddMessage(msg);
                 DeleteMessage(msg.index);
 
                 try
                 {
-                    SendEmail(msg.sender, msg.datetime.ToString(), msg.text);
+                    SendEmail(msg.number, msg.datetime.ToString(), msg.text);
                     Console.WriteLine("Message sent to email.");
                 }
                 catch (Exception ex)
@@ -275,7 +275,7 @@ namespace TeltonikaService
             SqlCommand sqlcmd = new SqlCommand();
             sqlcmd.Connection = conn;
             sqlcmd.CommandText = "INSERT into tblMessages ([sender],[message],[timestamp],[timestamp_router]) VALUES (@sender,@message,GETDATE(),@timestamp)";
-            sqlcmd.Parameters.AddWithValue("sender", message.sender);
+            sqlcmd.Parameters.AddWithValue("sender", message.number);
             sqlcmd.Parameters.AddWithValue("message", message.text);
             sqlcmd.Parameters.AddWithValue("timestamp", message.datetime);
             conn.Open();
