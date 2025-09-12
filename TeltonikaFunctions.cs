@@ -86,7 +86,7 @@ namespace TeltonikaService
         {
             public int index;
             public DateTime datetime;
-            public string sender;
+            public string number;
             public string text;
             public string status;
         }
@@ -111,7 +111,7 @@ namespace TeltonikaService
             {
                 SMSMessage tmpMsg = new SMSMessage();
                 tmpMsg.index = (int)SQLOutput[0];
-                tmpMsg.sender = SQLOutput[1].ToString();
+                tmpMsg.number = SQLOutput[1].ToString();
                 tmpMsg.text = SQLOutput[2].ToString();
                 outbox_list.Add(tmpMsg);
             }
@@ -119,11 +119,14 @@ namespace TeltonikaService
 
             foreach (SMSMessage msg in outbox_list)
             {
-                SendSMS(msg.sender, msg.text);
+                SendSMS(msg.number, msg.text);
 
                 //Remove from DB.
-                sqlcmd.CommandText = "DELETE FROM tblOutbox WHERE id = @mid";
-                sqlcmd.Parameters.AddWithValue("mid", msg.index);
+                sqlcmd.CommandText = "INSERT INTO tblSent (timestamp,destination,message) VALUES (GETDATE(),@msgnumber,@msgtext); DELETE FROM tblOutbox WHERE id = @mid";
+                sqlcmd.Parameters.AddWithValue("@mid", msg.index);
+                sqlcmd.Parameters.AddWithValue("@msgnumber", msg.number);
+                sqlcmd.Parameters.AddWithValue("@msgtext", msg.text);
+
                 sqlcmd.ExecuteNonQuery();
                 sqlcmd.Parameters.Clear();
             }
