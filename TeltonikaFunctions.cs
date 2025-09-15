@@ -115,7 +115,7 @@ namespace TeltonikaService
             string urlmsg = HttpUtility.UrlEncode(message);
             //GetRequest("sms_send", "number=" + number + "&text=" + urlmsg);
             string sendjson = "{\"data\": { \"number\": \"" + number + "\",\"message\":\"" + message + "\",\"modem\":\"" + modem_id + "\"}}";
-            PostRequest("messages/action/send", sendjson);
+            PostRequest("messages/actions/send", sendjson);
 
         }
 
