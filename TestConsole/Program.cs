@@ -13,8 +13,9 @@ namespace TestConsole
         {
             WinLogging.RegisterLog();
             TeltonikaFunctions.LoadConfig();
-            //TeltonikaFunctions.GetMessageList();
-
+            TeltonikaFunctions.GetMessageList();
+            //TeltonikaFunctions.GetAuthKey();
+            TeltonikaFunctions.ProcessOutbox();
         }
     }
 }

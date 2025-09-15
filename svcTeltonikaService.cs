@@ -54,7 +54,7 @@ namespace TeltonikaService
                     Thread.Sleep(500);
                 }
             } while (loadok == false && shutdown == false);
-            
+
 
             while (shutdown == false)
             {
@@ -70,7 +70,7 @@ namespace TeltonikaService
                     {
                         WinLogging.LogEvent("Get Message list failure exception: " + ex.ToString(), EventLogEntryType.Error);
                         error_state_in = true;
-                    }                   
+                    }
                 }
                 //Process outbox.
                 try
